@@ -13,7 +13,7 @@ $sql = "UPDATE funcionario
         CPF = '$cpf',
         Carteira_de_trabalho = '$carteira_de_trabalho',
         Cargo = '$cargo'
-        WHERE CPF = ''";
+        WHERE CPF = '$cpf'";
 
 if ($conn->query($sql) === TRUE) {
     echo "Funcionario atualizado com sucesso!";
