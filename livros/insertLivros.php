@@ -16,8 +16,9 @@ $sql = "INSERT INTO Livro (ISBN, Autor, Genero, Ano_de_publicacao, Editora, Stat
         VALUES ('$isbn', '$autor', '$genero', '$ano_publicacao', '$editora', '$status', '$exemplar')";
 
 if ($conn->query($sql) === TRUE) {
-    echo 'Livro inserido com sucesso!';
+    echo "Livro inserido com sucesso!";
 } else {
-    echo 'Erro ao inserir livro: ' . $conn->error;
+    echo "Erro ao inserir livro: " . $conn->error;
 }
+
 $conn->close();

@@ -16,8 +16,9 @@ $sql = "UPDATE Livro
         WHERE ISBN = '$isbn'";
 
 if ($conn->query($sql) === TRUE) {
-    echo 'Livro atualizado com sucesso!';
+    echo "Livro atualizado com sucesso!";
 } else {
-    echo 'Erro ao atualizar livro: ' . $conn->error;
+    echo "Erro ao atualizar livro: " . $conn->error;
 }
+
 $conn->close();

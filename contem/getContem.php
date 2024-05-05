@@ -15,26 +15,23 @@ if (!empty($data)) {
     $where_clause .= implode(" AND ", $filters);
 }
 
-$sql = "SELECT * FROM Doacao" . $where_clause;
+$sql = "SELECT * FROM Contem" . $where_clause;
 
 $result = $conn->query($sql);
 
-$doacoes = array();
+$contem = array();
 
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $doacao = array(
-            "ID_DOACAO" => $row["ID_DOACAO"],
-            "ISBN" => $row["ISBN"],
-            "CPF" => $row["CPF"],
-            "Data" => $row["Data"],
-            "Quantidade" => $row["Quantidade"]
+        $contem_item = array(
+            "ID_EMPRESTIMO" => $row["ID_EMPRESTIMO"],
+            "ISBN" => $row["ISBN"]
         );
-        $doacoes[] = $doacao;
+        $contem[] = $contem_item;
     }
-    echo json_encode($doacoes);
+    echo json_encode($contem);
 } else {
-    echo json_encode(array("message" => "Nenhuma doação encontrada."));
+    echo json_encode(array("message" => "Nenhuma associação encontrada."));
 }
 $conn->close();
 ?>

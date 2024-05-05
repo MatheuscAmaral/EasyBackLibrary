@@ -9,8 +9,10 @@ $id_doacao = $data['id_doacao'];
 $sql = "DELETE FROM Doacao WHERE ID_DOACAO = '$id_doacao'";
 
 if ($conn->query($sql) === TRUE) {
-    echo 'Doação deletada com sucesso!';
+    echo "Doação deletada com sucesso!";
 } else {
-    echo 'Erro ao deletar doação: ' . $conn->error;
+    echo "Erro ao deletar doação: " . $conn->error;
 }
+
 $conn->close();
+?>

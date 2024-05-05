@@ -13,8 +13,10 @@ $sql = "INSERT INTO Doacao (ISBN, CPF, Data, Quantidade)
         VALUES ('$isbn', '$cpf', '$data_doacao', '$quantidade')";
 
 if ($conn->query($sql) === TRUE) {
-    echo 'Doação inserida com sucesso!';
+    echo "Doação inserida com sucesso!";
 } else {
-    echo 'Erro ao inserir doação: ' . $conn->error;
+    echo "Erro ao inserir doação: " . $conn->error;
 }
+
 $conn->close();
+?>

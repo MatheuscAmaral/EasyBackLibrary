@@ -15,8 +15,10 @@ $sql = "UPDATE Doacao
         WHERE ID_DOACAO = '$id_doacao'";
 
 if ($conn->query($sql) === TRUE) {
-    echo 'Doação atualizada com sucesso!';
+    echo "Doação atualizada com sucesso!";
 } else {
-    echo 'Erro ao atualizar doação: ' . $conn->error;
+    echo "Erro ao atualizar doação: " . $conn->error;
 }
+
 $conn->close();
+?>
