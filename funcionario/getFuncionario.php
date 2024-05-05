@@ -14,26 +14,22 @@ if (!empty($data)) {
     }
     $where_clause .= implode(" AND ", $filters);
 }
-
-$sql = "SELECT * FROM usuario $where_clause";
+$sql = "SELECT * FROM Funcionario $where_clause";
 $result = $conn->query($sql);
 
-$usuarios = array();
+$funcionarios = array();
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $usuario = array(
+        $funcionario = array(
             'CPF' => $row['CPF'],
-            'Nome' => $row['Nome'],
-            'Endereco' => $row['Endereco'],
-            'Telefone' => $row['Telefone'],
-            'Email' => $row['Email'],
-            'Senha' => $row['Senha']
+            'Carteira_de_trabalho' => $row['Carteira_de_trabalho'],
+            'Cargo' => $row['Cargo']
         );
-        $usuarios[] = $usuario;
+        $funcionarios[] = $funcionario;
     }
-    echo json_encode($usuarios);
+    echo json_encode($funcionarios);
 } else {
-    echo json_encode(array('message' => 'Nenhum usuário encontrado'));
+    echo json_encode(array('message' => 'Nenhum funcionario encontrado.'));
 }
 $conn->close();
