@@ -10,7 +10,6 @@ $cargo = $data['cargo'];
 
 $sql = "UPDATE funcionario
         SET
-        CPF = '$cpf',
         Carteira_de_trabalho = '$carteira_de_trabalho',
         Cargo = '$cargo'
         WHERE CPF = '$cpf'";
