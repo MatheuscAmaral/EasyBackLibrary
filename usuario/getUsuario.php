@@ -20,6 +20,7 @@ if ($result->num_rows > 0) {
             'Endereco' => $row['Endereco'],
             'Telefone' => $row['Telefone'],
             'Email' => $row['Email'],
+            'Senha' => $row['Senha']
         );
         $usuarios[] = $usuario;
     }
