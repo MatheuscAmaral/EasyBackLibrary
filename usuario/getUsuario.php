@@ -5,18 +5,26 @@ require_once('../index.php');
 $data = json_decode(file_get_contents("php://input"), true);
 
 $where_clause = "";
+$filters = array();
 
 if (!empty($data)) {
     $where_clause .= " WHERE ";
-    $filters = array();
     foreach ($data as $key => $value) {
-        $filters[] = "$key = '$value'";
+        $filters[] = "$key = ?";
     }
     $where_clause .= implode(" AND ", $filters);
 }
 
-$sql = "SELECT * FROM usuario $where_clause";
-$result = $conn->query($sql);
+$sql = "SELECT CPF, Nome, Endereco, Telefone, Email, Senha FROM usuario $where_clause";
+$stmt = $conn->prepare($sql);
+
+if (!empty($filters)) {
+    $types = str_repeat('s', count($data));
+    $stmt->bind_param($types, ...array_values($data));
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 
 $usuarios = array();
 
@@ -28,7 +36,7 @@ if ($result->num_rows > 0) {
             'Endereco' => $row['Endereco'],
             'Telefone' => $row['Telefone'],
             'Email' => $row['Email'],
-            'Senha' => $row['Senha']
+            'Senha' => isset($row['Senha']) ? $row['Senha'] : null
         );
         $usuarios[] = $usuario;
     }
@@ -36,4 +44,6 @@ if ($result->num_rows > 0) {
 } else {
     echo json_encode(array('message' => 'Nenhum usuário encontrado'));
 }
+
+$stmt->close();
 $conn->close();
