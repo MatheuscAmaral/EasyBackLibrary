@@ -9,7 +9,6 @@ $where_clause = "";
 $filters = array();
 
 try {
-
     if (!empty($data)) {
         $where_clause .= " WHERE ";
         foreach ($data as $key => $value) {
@@ -38,6 +37,8 @@ try {
     }else{
         $response->setStatus(500);
         $response->setMessage('Ocorreu um erro no processamento.');
+        $response->setMessageErro($e->getMessage());
+        $response->setSql($selectGetUsuario);
     }
     echo $response->jsonResponse();
 }
