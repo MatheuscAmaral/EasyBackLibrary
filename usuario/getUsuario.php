@@ -1,49 +1,44 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 $where_clause = "";
 $filters = array();
 
-if (!empty($data)) {
-    $where_clause .= " WHERE ";
-    foreach ($data as $key => $value) {
-        $filters[] = "$key = ?";
+try {
+
+    if (!empty($data)) {
+        $where_clause .= " WHERE ";
+        foreach ($data as $key => $value) {
+            $filters[] = "$key = '$value'";
+        }
+        $where_clause .= implode(" AND ", $filters);
     }
-    $where_clause .= implode(" AND ", $filters);
-}
-
-$sql = "SELECT CPF, Nome, Endereco, Telefone, Email, Senha FROM usuario $where_clause";
-$stmt = $conn->prepare($sql);
-
-if (!empty($filters)) {
-    $types = str_repeat('s', count($data));
-    $stmt->bind_param($types, ...array_values($data));
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
-
-$usuarios = array();
-
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $usuario = array(
-            'CPF' => $row['CPF'],
-            'Nome' => $row['Nome'],
-            'Endereco' => $row['Endereco'],
-            'Telefone' => $row['Telefone'],
-            'Email' => $row['Email'],
-            'Senha' => isset($row['Senha']) ? $row['Senha'] : null
-        );
-        $usuarios[] = $usuario;
+    
+    $selectGetUsuario = "SELECT CPF, Nome, Endereco, Telefone, Email, Senha FROM usuario $where_clause";
+    $queryGetUsuario = $con->query($selectGetUsuario);
+    $respostaGetUsuario = $queryGetUsuario->fetchAll(PDO::FETCH_ASSOC);
+    $numeroLinhasGetUsuario = $queryGetUsuario->rowCount();
+    
+    if ($numeroLinhasGetUsuario > 0) {
+        $response->setMessage('Dados recuperados com sucesso.');
+        $response->setData($respostaGetUsuario);
+        echo $response->jsonResponse();
+    } else {
+        $response->setMessage('Nenhum usuário encontrado.');
+        echo $response->jsonResponse();
     }
-    echo json_encode($usuarios);
-} else {
-    echo json_encode(array('message' => 'Nenhum usuário encontrado'));
+} catch (Exception $e) {
+    if($e->getCode() == 1){
+        $response->setStatus(400);
+        $response->setMessage($e->getMessage());
+    }else{
+        $response->setStatus(500);
+        $response->setMessage('Ocorreu um erro no processamento.');
+    }
+    echo $response->jsonResponse();
 }
 
-$stmt->close();
-$conn->close();
