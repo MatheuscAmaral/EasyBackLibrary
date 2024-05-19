@@ -44,7 +44,7 @@ class Filter
 
             if ($limTam != null) {
                 if (!self::stringLimiteTam($string, $limTam)) {
-                    throw new Exception("O campo $campoNome ultrapassa o limite de caracteres de $limTam.");
+                    throw new Exception("O campo $campoNome ultrapassa o limite de $limTam caracteres.");
                 }
             }
 
