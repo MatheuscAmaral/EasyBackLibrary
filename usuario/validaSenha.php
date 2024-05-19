@@ -1,23 +1,62 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+require_once('../classes/funcoesValidadoras.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-$cpf = $data['cpf'];
-$senha = $data['senha'];
+$cpf = $data['cpf'] ?? null;
+$senha = $data['senha'] ?? null;
 
-$sql = "SELECT Senha FROM usuario WHERE cpf = '$cpf'";
-$resultado = $conn->query($sql);
+try {
 
-if ($resultado->num_rows > 0) {
-    $usuario = $resultado->fetch_assoc();
+    $cpf = Filter::retornaCampoTratado($cpf, null, 14, 'CPF', false);
 
-    if ($usuario[0]['Senha'] == $senha) {
-        echo json_encode(array('message' => 'Senha valida.'));
+    if (!$cpf['result']) {
+        throw new Exception($cpf['message'], 1);
     } else {
-        echo json_encode(array('message' => 'Senha invalida.'));
+        $cpf = $cpf['string'];
+
+        $selectValidaCPF = "SELECT * FROM USUARIO WHERE CPF = '$cpf'";
+        $queryValidaCPF = $con->query($selectValidaCPF);
+        $respostaValidaCPF = $queryValidaCPF->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($respostaValidaCPF)) {
+            throw new Exception('O CPF informado não esta relacionado a nenhum usuario cadastrado no sistema.', 1);
+        }
     }
-} else {
-    echo json_encode(array('message' => 'Usuário não encontrado.'));
+
+    $senha = Filter::retornaCampoTratado($senha, 20, null, 'Senha', false);
+
+    if (!$senha['result']) {
+        throw new Exception($senha['message'], 1);
+    } else {
+        $senha = $senha['string'];
+    }
+
+    $selectSenha = "SELECT Senha FROM usuario WHERE cpf = '$cpf'";
+    $querySenha = $con->query($selectSenha);
+    $respostaSenha = $querySenha->fetch(PDO::FETCH_ASSOC);
+
+    if ($respostaSenha['Senha'] == $senha) {
+        $response->setMessage('Senha valida.');
+        $response->setData(true);
+    } else {
+        $response->setMessage('Senha invalida.');
+        $response->setData(false);
+    }
+
+    echo $response->jsonResponse();
+} catch (Exception $e) {
+    if ($e->getCode() == 1) {
+        $response->setStatus(400);
+        $response->setMessage($e->getMessage());
+    } else {
+        $response->setStatus(500);
+        $response->setMessage('Ocorreu um erro no processamento.');
+        $response->setMessageErro($e->getMessage());
+        $response->setSql($sql);
+    }
+    echo $response->jsonResponse();
 }
