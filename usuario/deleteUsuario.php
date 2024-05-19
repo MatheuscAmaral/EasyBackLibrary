@@ -25,6 +25,9 @@ try {
         }
     }
 
+    $sql = "DELETE FROM Funcionario WHERE CPF = '$cpf'";
+    $con->query($sql);
+
     $sql = "DELETE FROM usuario
         WHERE CPF = '$cpf'";
 
