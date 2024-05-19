@@ -1,7 +1,7 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
-require_once('../funcoesValidadoras.php');
+require_once('../classes/funcoesValidadoras.php');
 $response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -16,7 +16,7 @@ $senha = $data['senha'] ?? null;
 
 try {
 
-    $cpf = retornaCampoTratado($cpf, null, 14, 'CPF');
+    $cpf = Filter::retornaCampoTratado($cpf, null, 14, 'CPF');
 
     if (!$cpf['result']) {
         throw new Exception($cpf['message'], 1);
@@ -32,7 +32,7 @@ try {
         }
     }
 
-    $nome = retornaCampoTratado($nome, 100, null, 'Nome');
+    $nome = Filter::retornaCampoTratado($nome, 100, null, 'Nome');
 
     if (!$nome['result']) {
         throw new Exception($nome['message'], 1);
@@ -40,7 +40,7 @@ try {
         $nome = $nome['string'];
     }
 
-    $endereco = retornaCampoTratado($endereco, 200, null, 'Endereço');
+    $endereco = Filter::retornaCampoTratado($endereco, 200, null, 'Endereço');
 
     if (!$endereco['result']) {
         throw new Exception($endereco['message'], 1);
@@ -48,7 +48,7 @@ try {
         $endereco = $endereco['string'];
     }
 
-    $telefone = retornaCampoTratado($telefone, 20, null, 'Telefone');
+    $telefone = Filter::retornaCampoTratado($telefone, 20, null, 'Telefone');
 
     if (!$telefone['result']) {
         throw new Exception($telefone['message'], 1);
@@ -56,7 +56,7 @@ try {
         $telefone = $telefone['string'];
     }
 
-    $email = retornaCampoTratado($email, 100, null, 'E-mail');
+    $email = Filter::retornaCampoTratado($email, 100, null, 'E-mail');
 
     if (!$email['result']) {
         throw new Exception($email['message'], 1);
@@ -64,7 +64,7 @@ try {
         $email = $email['string'];
     }
 
-    $senha = retornaCampoTratado($senha, 20, null, 'Senha', false);
+    $senha = Filter::retornaCampoTratado($senha, 20, null, 'Senha', false);
 
     if (!$senha['result']) {
         throw new Exception($senha['message'], 1);
