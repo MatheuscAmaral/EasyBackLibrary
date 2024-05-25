@@ -1,35 +1,47 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 $where_clause = "";
+$filters = array();
 
-if (!empty($data)) {
-    $where_clause .= " WHERE ";
-    $filters = array();
-    foreach ($data as $key => $value) {
-        $filters[] = "$key = '$value'";
+try {
+    if (!empty($data)) {
+        $where_clause .= " WHERE ";
+        foreach ($data as $key => $value) {
+            $filters[] = "$key = '$value'";
+        }
+        $where_clause .= implode(" AND ", $filters);
     }
-    $where_clause .= implode(" AND ", $filters);
-}
-$sql = "SELECT * FROM Funcionario $where_clause";
-$result = $conn->query($sql);
 
-$funcionarios = array();
+    $sql = "SELECT funcionario.CPF
+                , funcionario.Carteira_de_trabalho
+                , funcionario.Cargo
+            FROM funcionario $where_clause";
+    $query = $con->query($sql);
+    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+    $numResult = $query->rowCount();
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $funcionario = array(
-            'CPF' => $row['CPF'],
-            'Carteira_de_trabalho' => $row['Carteira_de_trabalho'],
-            'Cargo' => $row['Cargo']
-        );
-        $funcionarios[] = $funcionario;
+    if ($numResult > 0) {
+        $response->setMessage('Dados recuperados com sucesso.');
+        $response->setData($result);
+        echo $response->jsonResponse();
+    } else {
+        $response->setMessage('Nenhum funcionario encontrado');
+        echo $response->jsonResponse();
     }
-    echo json_encode($funcionarios);
-} else {
-    echo json_encode(array('message' => 'Nenhum funcionario encontrado.'));
+} catch (Exception $e) {
+    if ($e->getCode() == 1) {
+        $response->setStatus(400);
+        $response->setMessage($e->getMessage());
+    } else {
+        $response->setStatus(500);
+        $response->setMessage('Ocorreu um erro no processamento.');
+        $response->setMessageErro($e->getMessage());
+        $response->setSql($selectGetUsuario);
+    }
+    echo $response->jsonResponse();
 }
-$conn->close();
