@@ -1,34 +1,44 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$where_clause = "";
+try {
+    $where_clause = "";
 
-if (!empty($data)) {
-    $where_clause .= " WHERE ";
-    $filters = array();
-    foreach ($data as $key => $value) {
-        $filters[] = "$key = '$value'";
+    if (!empty($data)) {
+        $filters = array();
+        $where_clause .= " WHERE ";
+        foreach ($data as $key => $value) {
+            $filters[] = "$key = '$value'";
+        }
+        $where_clause .= implode(" AND ", $filters);
     }
-    $where_clause .= implode(" AND ", $filters);
-}
-$sql = "SELECT * FROM genero $where_clause";
-$result = $conn->query($sql);
 
-$generos = array();
+    $sql = "SELECT * FROM genero $where_clause";
+    $query = $con->query($sql);
+    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+    $numResult = $query->rowCount();
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $genero = array(
-            'ID_GENERO' => $row['ID_GENERO'],
-            'Nome_genero' => $row['Nome_genero']
-        );
-        $generos[] = $genero;
+    if ($numResult > 0) {
+        $response->setMessage('Dados recuperados com sucesso.');
+        $response->setData($result);
+        echo $response->jsonResponse();
+    } else {
+        $response->setMessage('Nenhum gênero encontrado.');
+        echo $response->jsonResponse();
     }
-    echo json_encode($generos);
-} else {
-    echo json_encode(array('message' => 'Nenhum gênero encontrado.'));
+} catch (Exception $e) {
+    if ($e->getCode() == 1) {
+        $response->setStatus(400);
+        $response->setMessage($e->getMessage());
+    } else {
+        $response->setStatus(500);
+        $response->setMessage('Ocorreu um erro no processamento.');
+        $response->setMessageErro($e->getMessage());
+        $response->setSql($sql);
+    }
+    echo $response->jsonResponse();
 }
-$conn->close();
