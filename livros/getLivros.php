@@ -1,42 +1,45 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 $where_clause = "";
+$filters = array();
 
-if (!empty($data)) {
-    $where_clause .= " WHERE ";
-    $filters = array();
-    foreach ($data as $key => $value) {
-        $filters[] = "$key = '$value'";
+try {
+
+    if (!empty($data)) {
+        $where_clause .= " WHERE ";
+        foreach ($data as $key => $value) {
+            $filters[] = "$key = '$value'";
+        }
+        $where_clause .= implode(" AND ", $filters);
     }
-    $where_clause .= implode(" AND ", $filters);
-}
 
-$sql = "SELECT * FROM Livro" . $where_clause;
+    $sql = "SELECT * FROM Livro " . $where_clause;
+    $query = $con->query($sql);
+    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+    $numResult = $query->rowCount();
 
-$result = $conn->query($sql);
-
-$livros = array();
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $livro = array(
-            "ISBN" => $row["ISBN"],
-            "Autor" => $row["Autor"],
-            "Genero" => $row["Genero"],
-            "Ano_de_publicacao" => $row["Ano_de_publicacao"],
-            "Editora" => $row["Editora"],
-            "Status" => $row["Status"],
-            "Exemplar" => $row["Exemplar"],
-        );
-        $livros[] = $livro;
+    if ($numResult > 0) {
+        $response->setMessage('Dados recuperados com sucesso.');
+        $response->setData($result);
+        echo $response->jsonResponse();
+    } else {
+        $response->setMessage('Nenhum livro encontrado.');
+        echo $response->jsonResponse();
     }
-    echo json_encode($livros);
-} else {
-    echo json_encode(array("message" => "Nenhum livro encontrado."));
+} catch (Exception $e) {
+    if ($e->getCode() == 1) {
+        $response->setStatus(400);
+        $response->setMessage($e->getMessage());
+    } else {
+        $response->setStatus(500);
+        $response->setMessage('Ocorreu um erro no processamento.');
+        $response->setMessageErro($e->getMessage());
+        $response->setSql($selectGetUsuario);
+    }
+    echo $response->jsonResponse();
 }
-$conn->close();
-?>

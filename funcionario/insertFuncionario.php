@@ -79,7 +79,7 @@ try {
         $response->setStatus(500);
         $response->setMessage('Ocorreu um erro no processamento.');
         $response->setMessageErro($e->getMessage());
-        $response->setSql($selectGetUsuario);
+        $response->setSql($insertFuncionario);
     }
     echo $response->jsonResponse();
 }

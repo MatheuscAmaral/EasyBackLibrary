@@ -56,7 +56,7 @@ try {
         $response->setStatus(500);
         $response->setMessage('Ocorreu um erro no processamento.');
         $response->setMessageErro($e->getMessage());
-        $response->setSql($sql);
+        $response->setSql($selectSenha);
     }
     echo $response->jsonResponse();
 }
