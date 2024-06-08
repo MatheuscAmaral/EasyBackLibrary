@@ -24,6 +24,11 @@ class Filter
         }
     }
 
+    static function retornaCampoNumerico(float $float)
+    {
+        return $float;
+    }
+
     static function retornaCampoTratado(mixed $string, int $limTam = null, int $limExt = null, string $campoNome, $formataString = true)
     {
         $result = true;

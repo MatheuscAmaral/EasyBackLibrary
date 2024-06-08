@@ -8,12 +8,15 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $cpf = $data['cpf'];
 $multa = $data['multa'];
-
 try {
 
-    $multa = (float) 0;
-
     $cpf = Filter::retornaCampoTratado($cpf, null, 14, 'CPF');
+
+    if (!is_numeric($multa)) {
+        throw new Exception('O campo de multa não é númerico.');
+    }
+    
+    $multa = Filter::retornaCampoNumerico($multa);
 
     if (!$cpf['result']) {
         throw new Exception($cpf['message'], 1);
@@ -38,18 +41,20 @@ try {
         if (empty($respostaValidaCPF)) {
             throw new Exception('Não existe um leitor com esse CPF.');
         }
+
+        $acumulo = Filter::retornaCampoNumerico($respostaValidaCPF['Multa']);
+
+        $multa = $multa + $acumulo;
     }
 
-    $sql = "INSERT INTO leitor
-        (CPF,
-        Multa)
-        VALUES
-        ('$cpf',
-         '$multa')";
+    $sql = "UPDATE leitor
+        SET
+            Multa = '$multa'
+        WHERE CPF = '$cpf'";
 
     $con->query($sql);
 
-    $response->setMessage("Leitor $usuario cadastrado com sucesso.");
+    $response->setMessage("Multa adicionada para $usuario sua divida se acumula em $multa");
 } catch (PDOException $e) {
     $response->setStatus(500);
     $response->setMessage('Ocorreu um erro no processamento.');
