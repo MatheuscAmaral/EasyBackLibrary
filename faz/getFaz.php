@@ -1,38 +1,41 @@
 <?php
 require_once('../database.php');
 require_once('../index.php');
+$response = new Response();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 $where_clause = "";
 
-if (!empty($data)) {
-    $where_clause .= " WHERE ";
-    $filters = array();
-    foreach ($data as $key => $value) {
-        $filters[] = "$key = '$value'";
+try {
+    if (!empty($data)) {
+        $where_clause .= " WHERE ";
+        $filters = array();
+        foreach ($data as $key => $value) {
+            $filters[] = "$key = '$value'";
+        }
+        $where_clause .= implode(" AND ", $filters);
     }
-    $where_clause .= implode(" AND ", $filters);
-}
 
-$sql = "SELECT * FROM Faz" . $where_clause;
+    $sql = "SELECT * FROM Faz" . $where_clause;
+    $query = $con->query($sql);
+    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+    $numResult = $query->rowCount();
 
-$result = $conn->query($sql);
-
-$faz = array();
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $faz_item = array(
-            "ID_EMPRESTIMO" => $row["ID_EMPRESTIMO"],
-            "CPF" => $row["CPF"],
-            "Quantidade" => $row["Quantidade"]
-        );
-        $faz[] = $faz_item;
+    if ($numResult > 0) {
+        $response->setMessage('Dados recuperados com sucesso.');
+        $response->setData($result);
+    } else {
+        $response->setMessage('Nada encontrado');
     }
-    echo json_encode($faz);
-} else {
-    echo json_encode(array("message" => "Nenhuma associação encontrada."));
+} catch (PDOException $e) {
+    $response->setStatus(500);
+    $response->setMessage('Ocorreu um erro no processamento.');
+    $response->setMessageErro($e->getMessage());
+    $response->setSql($sql);
+} catch (Exception $e) {
+    $response->setStatus(400);
+    $response->setMessage($e->getMessage());
+} finally {
+    echo $response->jsonResponse();
 }
-$conn->close();
-?>
