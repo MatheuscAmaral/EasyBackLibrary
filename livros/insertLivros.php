@@ -13,13 +13,14 @@ $ano_publicacao = $data['ano_publicacao'] ?? null;
 $editora = $data['editora'] ?? null;
 $status = $data['status'] ?? null;
 $exemplar = $data['exemplar'] ?? null;
+$imagem = $data['imagem'] ?? null;
 
 try {
 
 
 
-    $sql = "INSERT INTO Livro (ISBN, Autor, Genero, Ano_de_publicacao, Editora, Status, Exemplar)
-        VALUES ('$isbn', '$autor', '$genero', '$ano_publicacao', '$editora', '$status', '$exemplar')";
+    $sql = "INSERT INTO Livro (ISBN, Autor, Genero, Ano_de_publicacao, Editora, Status, Exemplar, Imagem)
+        VALUES ('$isbn', '$autor', '$genero', '$ano_publicacao', '$editora', '$status', '$exemplar', '$imagem')";
 
     if (!$con->query($sql)) {
         throw new Exception('Ocorreu um erro ao tentar criar um novo livro.', 1);
