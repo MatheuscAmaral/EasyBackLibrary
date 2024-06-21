@@ -17,7 +17,7 @@ try {
         $where_clause .= implode(" AND ", $filters);
     }
 
-    $sql = "SELECT * FROM Emprestimo 
+    $sql = "SELECT Emprestimo.ID_EMPRESTIMO, Emprestimo.Data_emprestimo, Emprestimo.Data_devolucao, Contem.ISBN, Faz.CPF, Faz.Quantidade FROM Emprestimo 
     INNER JOIN Contem ON Emprestimo.ID_EMPRESTIMO = Contem.ID_EMPRESTIMO
     INNER JOIN Faz ON Emprestimo.ID_EMPRESTIMO = Faz.ID_EMPRESTIMO
     " . $where_clause;
