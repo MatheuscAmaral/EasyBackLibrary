@@ -17,9 +17,12 @@ try {
         $where_clause .= implode(" AND ", $filters);
     }
 
-    $sql = "SELECT Emprestimo.ID_EMPRESTIMO, Emprestimo.Data_emprestimo, Emprestimo.Data_devolucao, Contem.ISBN, Faz.CPF, Faz.Quantidade FROM Emprestimo 
+    $sql = "SELECT Emprestimo.ID_EMPRESTIMO, Emprestimo.Data_emprestimo, Emprestimo.Data_devolucao, Contem.ISBN, Usuario.Nome, Exemplar.Exemplar, Faz.CPF, Faz.Quantidade FROM Emprestimo 
     INNER JOIN Contem ON Emprestimo.ID_EMPRESTIMO = Contem.ID_EMPRESTIMO
     INNER JOIN Faz ON Emprestimo.ID_EMPRESTIMO = Faz.ID_EMPRESTIMO
+    INNER JOIN Livro ON Contem.ISBN = Livro.ISBN
+    INNER JOIN Exemplar ON Livro.Exemplar = Exemplar.ID_EXEMPLAR
+    INNER JOIN Usuario ON Faz.CPF = Usuario.CPF
     " . $where_clause;
     $query = $con->query($sql);
     $result = $query->fetchAll(PDO::FETCH_ASSOC);

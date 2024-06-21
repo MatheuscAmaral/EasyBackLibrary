@@ -10,11 +10,8 @@ $data_devolucao = $data['data_devolucao'];
 $sql = "INSERT INTO Emprestimo (Data_emprestimo, Data_devolucao) 
         VALUES ('$data_emprestimo', '$data_devolucao')";
 
-if ($conn->query($sql) === TRUE) {
-    echo "Empréstimo inserido com sucesso!";
+if (!$con->query($sql)) {
+    echo "Erro ao inserir empréstimo.";
 } else {
-    echo "Erro ao inserir empréstimo: " . $conn->error;
+    echo json_encode(array("id" => $con->lastInsertId()));
 }
-
-$conn->close();
-?>
