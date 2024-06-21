@@ -26,6 +26,8 @@ try {
     } else {
         $response->setMessage("Livro ISBN: $isbn cadastrado com sucesso.");
     }
+
+    echo $response->jsonResponse();
 } catch (Exception $e) {
     if ($e->getCode() == 1) {
         $response->setStatus(400);
