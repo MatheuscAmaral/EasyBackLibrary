@@ -32,6 +32,7 @@ try {
         throw new Exception('Ocorreu um erro ao tentar cadastrar o exemplar.', 1);
     } else {
         $response->setMessage("Exemplar $exemplar cadastrado com sucesso.");
+        $response->setData($con->lastInsertId());
         echo $response->jsonResponse();
     }
 } catch (Exception $e) {
